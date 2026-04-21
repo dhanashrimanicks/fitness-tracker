@@ -8,7 +8,7 @@ export const getToken = async () => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        studentId: "E0123023", 
+        studentId: "e0123023", 
         password: "950167"
       })
     });
