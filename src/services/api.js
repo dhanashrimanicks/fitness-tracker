@@ -8,13 +8,15 @@ export const getToken = async () => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        studentId: "e0123023", 
+        studentId: "E0123023", 
         password: "950167"
       })
     });
 
     const data = await res.json();
+    console.log("TOKEN RESPONSE:", data);
     return data;
+
   } catch (err) {
     console.error("TOKEN ERROR:", err);
     return {};
@@ -30,7 +32,9 @@ export const getData = async (token) => {
     });
 
     const data = await res.json();
+    console.log("DATA RESPONSE:", data);
     return data;
+
   } catch (err) {
     console.error("DATA ERROR:", err);
     return { data: [] };

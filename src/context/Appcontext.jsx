@@ -10,31 +10,29 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 🔹 STEP 1: Get token
         const tokenRes = await getToken();
 
         if (!tokenRes || !tokenRes.token) {
-          console.error("Token error:", tokenRes);
+          console.error("Token failed");
+          dispatch({ type: "SET_DATA", payload: [] });
           return;
         }
 
-        // 🔹 STEP 2: Fetch data
         const dataRes = await getData(tokenRes.token);
 
-        console.log("API DATA:", dataRes); // DEBUG
+        // 🔥 SAFE HANDLING (NO CRASH)
+        const cleanData = Array.isArray(dataRes?.data)
+          ? dataRes.data
+          : [];
 
-        // 🔹 STEP 3: Handle invalid data safely
-const cleanData = Array.isArray(dataRes.data)
-  ? dataRes.data.filter((item) => item)
-  : [];
-        // 🔹 STEP 4: Store in reducer
         dispatch({
           type: "SET_DATA",
           payload: cleanData
         });
 
-      } catch (error) {
-        console.error("FETCH ERROR:", error);
+      } catch (err) {
+        console.error("FETCH ERROR:", err);
+        dispatch({ type: "SET_DATA", payload: [] });
       }
     };
 

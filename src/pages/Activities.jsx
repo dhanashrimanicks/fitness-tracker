@@ -5,26 +5,29 @@ import ActivityItem from "../components/ActivityItem";
 const Activities = () => {
   const { state } = useContext(AppContext);
 
-  // ✅ FILTER VALID ACTIVITIES (MANDATORY)
-  const validActivities = state.activities.filter(
+  const validActivities = (state.activities || []).filter(
     (a) =>
       a &&
-      a.steps > 0 &&
-      a.caloriesburned > 0 &&
-      a.workoutminutes > 0 &&
-      typeof a.goalachieved === "boolean"
+      (a.steps || 0) > 0 &&
+      (a.caloriesburned || a.caloriesBurned || 0) > 0 &&
+      (a.workoutminutes || a.workoutMinutes || 0) > 0 &&
+      typeof (a.goalachieved ?? a.goalAchieved) === "boolean"
   );
 
   return (
     <div>
       <h2>Activities</h2>
 
-      {validActivities.map((activity) => (
-        <ActivityItem
-          key={activity.activityid}
-          activity={activity}
-        />
-      ))}
+      {validActivities.length === 0 ? (
+        <p>No Activities Found</p>
+      ) : (
+        validActivities.map((activity) => (
+          <ActivityItem
+            key={activity.activityid}
+            activity={activity}
+          />
+        ))
+      )}
     </div>
   );
 };
