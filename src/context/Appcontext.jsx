@@ -24,8 +24,9 @@ export const AppProvider = ({ children }) => {
         console.log("API DATA:", dataRes); // DEBUG
 
         // 🔹 STEP 3: Handle invalid data safely
-        const cleanData = (dataRes.data || []).filter((item) => item);
-
+const cleanData = Array.isArray(dataRes.data)
+  ? dataRes.data.filter((item) => item)
+  : [];
         // 🔹 STEP 4: Store in reducer
         dispatch({
           type: "SET_DATA",
