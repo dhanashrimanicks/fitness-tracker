@@ -1,42 +1,53 @@
-const BASE_URL = "https://t4e-testserver.onrender.com/api";
+import axios from 'axios'
 
-export const getToken = async () => {
-  try {
-    const res = await fetch(`${BASE_URL}/public/token`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        studentId: "E0123023", 
-        password: "950167"
-      })
-    });
+const BASE_URL = 'https://t4e-testserver.onrender.com/api'
 
-    const data = await res.json();
-    console.log("TOKEN RESPONSE:", data);
-    return data;
+const API_CREDENTIALS = {
+  studentId: import.meta.env.VITE_STUDENT_ID ?? 'E0123023',
+  set: import.meta.env.VITE_DATASET_SET ?? 'setB',
+  password: import.meta.env.VITE_STUDENT_PASSWORD ?? '950167',
+}
 
-  } catch (err) {
-    console.error("TOKEN ERROR:", err);
-    return {};
+const extractOrders = (payload) => {
+  if (Array.isArray(payload)) {
+    return payload
   }
-};
 
-export const getData = async (token) => {
-  try {
-    const res = await fetch(`${BASE_URL}/private/data`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+  if (payload && typeof payload === 'object') {
+    if (Array.isArray(payload.orders)) {
+      return payload.orders
+    }
 
-    const data = await res.json();
-    console.log("DATA RESPONSE:", data);
-    return data;
+    if (payload.data && typeof payload.data === 'object' && Array.isArray(payload.data.orders)) {
+      return payload.data.orders
+    }
 
-  } catch (err) {
-    console.error("DATA ERROR:", err);
-    return { data: [] };
+    const nestedArray = Object.values(payload).find((value) => Array.isArray(value))
+    if (nestedArray) {
+      return nestedArray
+    }
   }
-};
+
+  return []
+}
+
+export const fetchOrdersDataset = async () => {
+  const tokenResponse = await axios.post(${BASE_URL}/public/token, API_CREDENTIALS)
+
+  const token = tokenResponse?.data?.token
+  const dataUrl = tokenResponse?.data?.dataUrl
+
+  if (!token || !dataUrl) {
+    throw new Error('Token response is missing required fields.')
+  }
+
+  const datasetEndpoint = dataUrl.startsWith('http') ? dataUrl : ${BASE_URL}${dataUrl}
+
+  const datasetResponse = await axios.get(datasetEndpoint, {
+    headers: {
+      Authorization: Bearer ${token},
+    },
+  })
+
+  return extractOrders(datasetResponse.data)
+}
